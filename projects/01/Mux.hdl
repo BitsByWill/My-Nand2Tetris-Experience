@@ -1,0 +1,38 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/Mux.hdl
+
+/** 
+ * Multiplexor:
+ * out = a if sel == 0
+ *       b otherwise
+ * implemented pretty inefficiently, but just used some basic boolean algebra
+ * to derive boolean expression from truth table
+ */
+
+CHIP Mux {
+    IN a, b, sel;
+    OUT out;
+
+    PARTS:
+	Not (in=b, out=notb);
+	Not (in=a, out=nota);
+	Not (in=sel, out=notsel);
+	/**a=1, b=0, sel=0*/
+	And (a=a, b=notb, out=out1);
+	And (a=out1, b=notsel, out=outMain1);
+	/**a=1, b=1, sel=0*/
+	And (a=a, b=b, out=out2);
+	And (a=out2, b=notsel, out=outMain2);
+	/**a=0, b=1, sel=1*/
+	And (a=nota, b=b, out=out3);
+	And (a=out3, b=sel, out=outMain3);
+	/**a=1, b=1, sel=1*/
+	And (a=a, b=b, out=out4);
+	And (a=out4, b=sel, out=outMain4);
+	/**combine*/
+	Or (a=outMain1, b=outMain2, out=part1);
+	Or (a=part1, b=outMain3, out=part2);
+	Or (a=part2, b=outMain4, out=out);
+}

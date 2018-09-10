@@ -1,0 +1,73 @@
+Notes:
+associative and distributive laws and de morgan in boolean algebra
+Ex. x or (y or z) = (x or y) or z (same with and) 
+Ex. x and (y or z) = (x and y) or (x and z)
+Idempotence value and value = value
+Double negation not not x = x
+
+From truth table to boolean function:
+-start with rows with 1 and make a working expression for each row
+-or all the 1 rows together
+-then simplify
+Sum-Of-Products, or SOP, Boolean expressions may be generated from truth tables quite easily, by determining which rows of the table have an output of 1, writing one product term for each row, and finally summing all the product terms. This creates a Boolean expression representing the truth table as a whole.
+Sum-Of-Products expressions lend themselves well to implementation as a set of AND gates (products) feeding into a single OR gate (sum).
+Product-Of-Sums, or POS, Boolean expressions may also be generated from truth tables quite easily, by determining which rows of the table have an output of 0, writing one sum term for each row, and finally multiplying all the sum terms. This creates a Boolean expression representing the truth table as a whole.
+Product-Of-Sums expressions lend themselves well to implementation as a set of OR gates (sums) feeding into a single AND gate (product).
+-add is OR
+-multiply is AND
+
+-all can represented only with not and and - in reality, nand can do everything - nand(x, x) = Not (x and x)
+-Ex. Not x = x Nand x
+-Ex. x and y = Not(x Nand y)
+
+Logic Gates:
+-Elementary: Nand, And, Or, Not
+-Composite: bunch of elementary gates
+-signals can send simultaenous signals to gates
+
+HDL:
+HDL file (we will use CHIP)
+-just a textual description of chip
+-functional language
+-go left to right with chip diagram
+-mainly VHDL and Verilog
+-specify:
+	-module name
+	-inputs
+	-outputs
+	-specify implementation w/ PARTS
+	-you can split signals
+	-can use other gates with official names and hdl vars only
+	-Ex. if use not and not's var is in, must use in=var in module
+	-must name all signals
+	-describe gate diagram one signal at a time and connections
+Ex.
+CHIP Xor
+{
+	IN a, b;
+	OUT out;
+	
+	PARTS: //implementation
+	Not (in=a, out=nota);
+	Not (in=b, out=notb);
+	And (a=a, b=notb, out=aAndNotb);
+	And (a=nota, b=b, out=notaAndb);
+	Or (a=aAndNotb, b=notaAndb, out=out);
+}
+	
+-or is three nand gates 2 to 1
+-array of bits, messed with together is a bus
+-each bit equals a wire
+-specify array with var[size]
+-can access index of the bits
+-specify range with x..y (Ex. 0..7)
+-for this project, false and true may be used as buses of any width
+-multiplexor-select signal to forward
+-can make programmable gate
+-only need not, or, and for multiplexor
+-demultiplexor - take in input and give a or b
+-can combine mux and dmux for communication
+-bus - right to left
+
+	
+
