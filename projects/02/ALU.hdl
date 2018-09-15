@@ -1,0 +1,68 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ALU.hdl
+
+/**
+ * The ALU (Arithmetic Logic Unit).
+ * Computes one of the following functions:
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * according to 6 input bits denoted zx,nx,zy,ny,f,no.
+ * In addition, the ALU computes two 1-bit outputs:
+ * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
+ * if the ALU output < 0, ng is set to 1; otherwise ng is set to 0.
+ */
+
+// Implementation: the ALU logic manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) set x = 0        // 16-bit constant
+// if (nx == 1) set x = !x       // bitwise not
+// if (zy == 1) set y = 0        // 16-bit constant
+// if (ny == 1) set y = !y       // bitwise not
+// if (f == 1)  set out = x + y  // integer 2's complement addition
+// if (f == 0)  set out = x & y  // bitwise and
+// if (no == 1) set out = !out   // bitwise not
+// if (out == 0) set zr = 1
+// if (out < 0) set ng = 1
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    PARTS:
+    //run zx and zy if needed
+	Mux16 (a=x, b=false, sel=zx, out=notX);
+	Mux16 (a=y, b=false, sel=zy, out=notY);
+	//run nx if needed
+	Not16 (in=notX, out=ifNX);
+	Mux16 (a=notX, b=ifNX, sel=nx, out=finalX);
+	//run ny if needed
+	Not16 (in=notY, out=ifNY);
+	Mux16 (a=notY, b=ifNY, sel=ny, out=finalY);
+	//choose which version to compute based on false
+	Add16 (a=finalX, b=finalY, out=sum);
+	And16 (a=finalX, b=finalY, out=logicAnd);
+	Mux16 (a=logicAnd, b=sum, sel=f, out=tempOut1);
+	//decide whether to negate the output
+	Not16 (in=tempOut1, out=tempOut2);
+	Mux16 (a=tempOut1, b=tempOut2, sel=no, out[15]=isNeg, out[0..7]=temp1, out[8..15]=temp2, out=out);
+	//determine ng
+	Mux (a=false, b=true, sel=isNeg, out=ng);
+	//determine zr
+	Or8Way (in=temp1, out=temp3);
+	Or8Way (in=temp2, out=temp4);
+	Or (a=temp3, b=temp4, out=testIfZero);
+	Not (in=testIfZero, out=zr);
+}

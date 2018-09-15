@@ -69,5 +69,33 @@ CHIP Xor
 -can combine mux and dmux for communication
 -bus - right to left
 
-	
+-Boolean Arithmetic and the ALU
+-usually when allocated, about half of bits for negatives
+-add and negative is all that you need, multiply and divide better easier at software level
+-if overflow, computer usually do nothing
+-Adder
+-Half Adder - adds two bits
+-Full Adder - adds three bits
+-Adder - adds two numbers
+-Half Adder:
+	-takes in two bits, return two output
+	-returns a sum and a carry bit
+-Full Adder
+	-takes in three bits, return a sum and carry bit
+-Multi-bit Adder
+	-start with half-adder
+	-then full adders
+-Negative Numbers in Binary
+	-use first bit as sign bit, but problem with two zeroes
+	-SO NOW TWO'S COMPLEMENT
+	-negative number -x represented with 2^n - x where n is bus size
+	-lose left most bit
+	-probably just flip all bits to get negative and then add one
+	-to add one, flip the bits from right to left, stopping the first time 0 is flipped to one
+-Von Neumann Architecture
+-multiple bits as input, including what function to use (predefined)
+-ALU has both logical and arithmetic units
+-what function to use is fed in via a truth table
+-two output bits later - for HACK, there is one that tells if zero and if negative
+
 
