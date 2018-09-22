@@ -98,4 +98,92 @@ CHIP Xor
 -what function to use is fed in via a truth table
 -two output bits later - for HACK, there is one that tells if zero and if negative
 
+-what we need now
+-use the same hardware over and over again
+-memory to store states
+-need to make sure to not compute faster than physically possible
+-the clock
+	-convert continuous time into discrete time
+	-each cycle is one digital time unit
+	-sequential logic
+		-just inputs labeled by time
+	-choose clock to make sure things work, make sure voltage stabilize in transistor
+	-use end of voltage instability region as the official state for input
+-combinatorial logic vs sequential logic
+-combinatorial: out[t] = function(int[t])
+-sequential: out[t] = fucntion(int[t-1])
+-because of sequential logic, can manuipulate to this:
+	state[t] = function(state[t-1])
+-can have values in same wires
+-sequential logic - depends on present and previous values
+-hence, sequential logic has state, or memory
+-Ex.
+| 1 |   2  |   3  |time
+| a | f(a) | f(b) |state
+a     b      c
+    ->     ->
+-slowest sequential logic is the clock speed
+-Remember state
+-need one bit of information from t-1
+-can be either 0 or 1
+-when go from t-1 to t, must remember its state, 0 or 1
+-remembers by flipping between these possible states - Flip-Flops
+-remember the flip flops
+-flip flops made from nand gates - put nand gates in a loop method
+-nand2tetris simulator forbids combinatorial loops, only sequential gate for loops
+-sequential logic implementation
+	-get combinatorial logic gate with input from t and t-1
+	-send signal to array of flip flops
+	-send back previous signal as t-1 and also output
+-remember forever with 1-bit register
+-this chip (1 bit register) is the bit chip - two inputs, input and load
+-logic like this: if load(t-1) then out(t)=in(t-1) else out(t)=out(t-1)
+	-so if load(t-1) is 1, then output is input at time t-1, else just keep outputting old value
+	-remembers the in bit if load is set to 1
+-possible implementation, need D flip flop
+	-use mux plus d flip flop, load and in and return value from flip flop connect to multiplexer
+-CHANGE BY NEXT CYCLE IN REGISTER
+-basic memory
+	-chain 1-bit register, make multi-bit register - bus size is word width
+	-register;s state - value currently being expressed by internal circuit
+	-get value by reading out value
+	-set new value using in and set load to 1 for that value
+
+	-RAM abstraction
+	-sequence of n addressable registers with addresses 0 to n-1
+	-holds registers, only one register selected at a time
+	-need to select unique regiser using input called address
+	-need log base 2 of n of bits for address input
+	-sequential chip (has triangles in diagram)
+	-read register by set address to desired address and probe the out state
+	-write by set address, set in, and assert load bit
+	-change by next cycle onwards
+	-can select any register at same time period
+
+-counters
+	-device which stores (and sometimes displays) the number of times a particular event or process has occurred, often in relationship to a clock signal
+	-helps keep track of which instruction should be fetched and executed next
+	-three possible control settings - reset (Fetch first instruction), next (Fetch next instruction), goto (fetch instruction specified)
+	-abstraction
+		input and ouput, three control bits - reset, load, inc
+	-if no control bits specified, just emit control state
+
+-building a flip flop
+	-connect to nand gates, each with their own input and one of the input being from the output of the other
+	-this makes it very stable
+
+-building the 8 register RAM
+	-should send in statement to all registers first
+	-then use mux and dmux to get right one
+
+-bigger register RAM
+	-stack up the ram below
+	-address input can be thought of binary value with 2 fields - which RAM and which register in the selected RAM part
+	-use mux and dmux
+
+-counter
+	-can use incrementer, register chips, and logic gates
+
+-can loop in HDL, just use the variable in two different places (Ex. start and beginning)
+
 
