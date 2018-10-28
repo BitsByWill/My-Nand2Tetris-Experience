@@ -187,3 +187,107 @@ a     b      c
 -can loop in HDL, just use the variable in two different places (Ex. start and beginning)
 
 
+-machine code - sequence of bits to specify instruction, register, etc.
+-also have symbols for where
+-include basic operations, flow control, logic, arithmetic, may have more functionality, like division and larger data types
+-access memory location is expensive
+	-need to supply long address and takes time
+	-so use memory hierarchy, use registers, cache, main memory, disk
+-registers
+	-data register, and address register (connect to bigger memory)
+-addressing modes (which memory to operate on)
+	-can add register directly
+	-can add register to memory location
+	-can add register to register with memory location on bigger part
+	-can add a number to a register
+	-used add as an example here
+-input output uses a lot of memory (ex. mouse stores last location)
+-flow control
+	-usually just go to next instruction (1 to 2)
+	-so jump to which instruction
+	-there are unconditional and conditional jump
+-assembler converts assembly to machine language
+-if 16 bit computer
+	-all data moved in 16 bit
+	-data memory - sequence of 16 bit registers
+	-instruction memory - sequency of 16 bit memory
+	-CPU - operate on 16 bits
+	-data/instruction/address bus - 16 bit width
+-for HACK machine
+	-load in program, press reset, it starts running
+	-3 registers, D, 16 bit data, A, 16 bit data or address, M, selected memory register in RAM
+	-A and C instructions
+	-A instruction -@value, where value is non-negative,a symbol referring to a constant
+	Ex. @21
+		-set A register to 21
+		RAM[21] becomes selected RAM register
+	Ex. set RAM[100] to -1
+		@100
+		M=-1 //selected memory register
+	C instruction
+		-dest, comp, jump
+		-get a computation, store or jump
+		-dest and jump is optional
+		-comp-can do a bunch of values on 0, 1, A, D, M
+		-dest - can go to: null, registers, simultaneously
+		-jump register - null, JGT, JEQ, JGE, JLT, JNE, JLE, JMP - always compared to 0
+		-syntax is dest = comp; jump
+	-if just jump 0;JMP - language requires the ;
+-can write machine language symbolically or binary code
+-binary code is just opcode
+	-Ex. in Hack, 0 can just be @
+	-Ex. in Hack, c-instruction, start with opcode 1, two unused bits, a comp bit, dest bit, and jump bits
+	-just use a cheatsheet or map 
+-input output- like screen and keypad
+-screen memory map - used to constantly refresh physical display
+-so can manipulate some bits to change refresh cycle, can be treated as matrix
+-always take out 16 bit and change and send back (first 32 rows is the first row on display for HACK)
+-to set pixel (row,col): i=32*row + col/16
+-for this, screen can be its own chip, access from Screen chip
+-if add based on overall picture, add 16384 beforehand
+-pixel can be retrieved as column % 16
+-also keyboard memory map
+	-just a single 16 bit register, key press goes to scan code
+	-all keys represented by scan key
+	-in HACK - 24576 in RAM
+	-if 0, no key pressed
+-assembly - mneumnoics
+-use CPU Emulator for nand2tetris
+-register and memory
+-M is always RAM[A]
+-in assembler, get rid of whitespace
+-need to terminate program, else malicious code can be placed there if program doesn't terminate
+	-avoid (NOP slide, null instruction/opcode attack)
+	-end with infinite loop
+
+-virutal registers too -R0, R1, R2,... R15 = 0, 1, 2, 3, 4, 5, ... 15
+-HACK is case sensitive
+
+-now, let's go to branching, variables, iteration
+-branching: evaluate boolean and see if jump or move on
+	-for asm, only goto stuff
+	-layer the jumps correctly
+-prevent unreadable code with symbolic referenes
+-@LABEL loads it and (LABEL) declares that block
+-assembler takes care of this, replace with instruction number
+-variables, only one variable type- 16 bit register
+	-in hack, can just do @var - tell computer to represent that part as this symbol
+-PLEASE COMMENT FOR YOUR SANITY
+-all variables allocated 16 and on wards
+-this allow for re-allocatable memory, needed if multitasking
+-can use anywhere in memory as long as know base memory
+-loader takes care of where symbols go to in memory
+
+-iteration
+	-obvious
+-always write first in pseudo code
+-paranthesis is the symbolic declarator for branching
+
+-Pointers
+-add D plus M, assign to A - set addresses
+-Ex. A=D+m\nM=-1
+-set address register to the value of some value register (use pointer arithmetic to figure it out)
+- -1 for black pixel
+-read kbd to see which key is pressed
+-labels is uppercase
+-variables is lowercase
