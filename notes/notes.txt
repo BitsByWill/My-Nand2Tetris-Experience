@@ -291,3 +291,126 @@ a     b      c
 -read kbd to see which key is pressed
 -labels is uppercase
 -variables is lowercase
+
+-universal turing machine
+-von neumann architecture
+-memory with program, data, with CPU, input and output
+-our CPU has this - ALU, with registers, we also have the control unit
+-three types of information
+	-data
+	-address - which instruction, which data use, execute
+	-control - tell what to do
+	-connected by control, address, data bus
+-in ALU
+	-only data and control bus (which operation to perform 
+	-data feeds in values
+	-control - specify operation, have to tell other parts of system what to do
+-in CPU register
+	-take in data from data bus and feed back to data bus
+	-store addresses (indirect addressing)
+	-connect to address bus
+-in Memory
+	-what address to work with
+	-also data bus
+	-data and program memory, with control bus too
+-Fetch-execute Cycle
+	-fetch instruction from CPU memory
+		-put the location of the next instruction into the address of the program memory
+	-read to get content and run
+-how to input address to program memory
+-use program counter, manipulate it
+-instruction tells what to do
+-different bits control what to do
+-instruction gets from program memory, tell where instruction come from and control bus what to do
+-tells what exactly to do
+-addressing clash between fetch and execute cycle
+	-both program and data reside in memory
+	-so fetch, get instruction from address of next instruction
+	-also need to get address of data we need
+	-CLASH
+	-so do one at a time, multiplexer, point to which address at which cycle
+	-multiplexor connected to program counter, data address, determined by fetch/execute bit
+-simpler solution, keep program and data separated, it is Harvard Architecture
+-CPU
+	-heart of computation, seat of control
+	-HACK CPU
+	-16 bit processor
+	-execute current instruction
+	-input and output
+	-INPUTS
+		-data memory, 16 bit
+		-instruction memory, 16 bit, value of selected instruction register memory
+		-reset, 1 bit input
+	-OUTPUTS
+		-to write to data memory
+			-what to write, outM
+			-where to write: addressM
+			-1 bit load bit
+			-program counter for next instruction memory
+	-look at the cpu designs
+	-all the "c" represents control bits
+	-Instruction handling
+		-instruction goes to mux16 and A register
+		-send in instruction
+		-@ instruction starts with 0
+		-opcode + 15 bit value
+		-put 15 bit value into A-register
+		-outputs the value
+		-if starts with opcode 1, it is C instruction
+		-decode the fields for different handling
+		-A register can be fed from input or ALU output
+		-if opcode is 1, loop input from ALU output
+		-this needs to be implemented
+	-ALU OPERATION
+		-from D register or the A/M register
+		-control bit tell which
+		-6 bits
+		-can now computer and output, can feed to D register, A-register via multiplexor, or M register
+	-also destination bits, determine if register/memory accepts ALU output
+	-ALU can also document if output is 0 or -1
+	-reset input, help current program start running
+	-control operations
+		- Ex. 122accccccdddjjj - represent 0 and 1s
+		-j is junk bits - 3 jump bits are 0, no jump, all 1, unconditional goto, else, conditional go to
+		-do this with program counter
+			-always emit emit address of next execute
+			-if want to start, equal 0
+			-increment by one step usually
+			-if unconditional jump, take from A
+			-if conditional, if condition true, make jump or just keep incrementing
+			-some logic
+			-if reset==1 PC = 0
+			else, look at jump bits
+			-store result in load, if load bit, jump
+			-else program counter++
+	-CPU instructions
+		-if include D and A, the respective values are read or written to
+		-if @x instruction, x is stored in the A-register and emitted by addressM
+		-if M included on right hand side, this value is read from inM
+		-if M included in Left hand side, ALU output is emitted by outM and writeM bit asserted
+		-if there is jump, set counter to that value, otherwise, just increment
+	-Memory - 0 to 16383 is data memory, 16384 to 24575 is screen, last one is keyboard
+	-so first segment is RAM, then two separate chip parts
+	-RAM16K, screen is 8K memory map, with special SCREEN chip, based on regular RAM chip with ability to refresh
+	-Keyboard, single 16 bit register, 0 if nothing pressed
+	-use builtin keyboard chip, regular chip with ability to reflect what user press
+	-read keyboard by probing the output of the keyboard register
+	-reset button too
+	-instruction memory immplemented with ROM 32K
+	-usually burned into ROM chip, plug in
+	-in this course, store as text file and put into hardware simulator
+	-ROM chip - address in, output out, output is content from address sent in, fed in from program counter
+	-CPU connected to memory output
+	-for Project 5, let's start building this architecture
+	-computer on memory and CPU, memory makes use of RAM and register units
+	-CPU makes use of registers, Program Counters (use registers), and ALU
+	-C control bits, use HDL subscripting to figure out which bit goes where
+	
+	-in classic von neumann, data and program in same memory, had to fetch in separate cycles
+	-von Neumann for normal use, Harvard for embedded use
+	-finite machine state - what computer to do at different states
+	-add a state register
+	-if want to add more peripherals, add device controllers, to offload from CPU
+	-Ex. GPU offloads
+	-input/memory/bits read in backwards in this part basically I think
+	

@@ -1,0 +1,98 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	//REMEMBER, ALL INSTRUCTION IS IN THIS FORMAT 
+	//A INSTRUCTION - 0........
+	//C INSTRUCTION - 1_ _ a cccccc ddd jjj - backward bits
+	//the underscores are just filler ins, a and c are for computation, what computation to do, control bits for ALU
+	//d represents destination
+	//j represenets jump condition
+    //look at given CPU instruction and machine language chart
+	
+	//figure out A or C instruction
+	Not(in=instruction[15], out=isAInstruction);
+	And(a=true, b=instruction[15], out=isCInstruction);
+	
+	//Check if C instruction and going back to A register, usually requires ALU sending stuff back
+	And(a=instruction[5], b=isCInstruction, out=ALUBackToA);
+	Mux16(a=instruction, b=ALUOutput, sel=ALUBackToA, out=ARegInput);
+	
+	//make sure to load the register if A instruction or C stuff with dest to A coming in
+	Or(a=isAInstruction, b=ALUBackToA, out=loadItA);
+	ARegister(in=ARegInput, load=loadItA, out=ARegOutput, out[0..14]=addressM);
+	
+	//check if from A or M, will be first bit in the comp section, take a look at chart
+	Mux16(a=ARegOutput, b=inM, sel=instruction[12], out=AorMOut);
+	
+	//check if d register needs to be loaded FROM THE ALU
+	And(a=isCInstruction, b=instruction[4], out=needD);
+	DRegister(in=ALUOutput, load=needD, out=DRegOutput);
+	
+	//ALU TIME, look at pictures
+	
+	ALU(x=DRegOutput, y=AorMOut, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUOutput, out=outM, zr=ZeroOut, ng=NegOut);
+	
+	//check if write to memory
+	And(a=isCInstruction, b=instruction[3], out=writeM);
+	
+	//checking program counter stuff
+	And(a=NegOut, b=instruction[2], out=jlt);
+	And(a=ZeroOut, b=instruction[1], out=jeq);
+	
+	//see if positive and do jgt
+	Or(a=NegOut, b=ZeroOut, out=isNotPositive);
+	Not(in=isNotPositive, out=isPositive);
+	And(a=isPositive, b=instruction[0], out=jgt);
+	
+	//other jump conditionals
+	Or(a=jlt, b=jeq, out=jle);
+	Or(a=jgt, b=jeq, out=jge);
+	
+	//check if will jump, all conditionals now covered
+	Or(a=jge, b=jle, out=jump);
+	
+	//will not jump if A instruction, only work if C instruction
+	And(a=isCInstruction, b=jump, out=willJump);
+	Not(in=willJump, out=willInc);
+	
+	//final part counter
+	PC(in=ARegOutput, load=willJump, inc=willInc, reset=reset, out[0..14]=pc);
+}
