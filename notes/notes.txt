@@ -413,4 +413,24 @@ a     b      c
 	-if want to add more peripherals, add device controllers, to offload from CPU
 	-Ex. GPU offloads
 	-input/memory/bits read in backwards in this part basically I think
-	
+
+-assembler - translate assembly to machine code, first software layer for most computers
+-can be done with cross-compiler
+-read assembly language command, break apart different parts, translate it, move on until EOF
+-use the syntax to help break fields apart after reading in as array etc.
+-then translate into opcode, pad and combine translated fields
+-then make into format for computer
+-hard part is symbol handling, labels and variables
+-must replace all labels and vars with addresses that must be remembered, keep in table
+-small problem, forward reference with labels
+-easy fix, first pass to get all labels and make a table, then second pass translate
+-get rid of comments and whitespace
+-binary syntax for @: 0valueInBinary
+-use parser, C instruction start with 3 ones
+-start by parsing all instructions
+-symbol handling - variable, label, and pre-defined
+-variable assignment starts from address 16 onwards
+-symbol table, keep track of number lines (start from 0)
+-we are building a two pass assembler - extract from program label and then variable
+-added layers of abstraction not in HACK
+	-macros
